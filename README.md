@@ -17,7 +17,14 @@ A demonstration with Golang, Hyperapp and Terraform
 - [Sequence Diagram](#sequence-diagram)
 - [REST API Documentation](#rest-api-documentation)
     - [Introduction](#introduction)
+      - [Authentication](#authentication)
+      - [Responses](#responses)
+      - [Errors](#errors)
     - [Messages](#messages)
+      - [Retrieve all Messages](#retrieve-all-messages)
+      - [Retrieve an existing Message](#retrieve-an-existing-message)
+      - [Create a Message](#create-a-message)
+      - [Delete a Message](#delete-a-message)
 
 ## Development
 
@@ -129,8 +136,74 @@ $ docker run -d --name audition --restart unless-stopped -p 80:8080 -v $(pwd)/db
 
 ## Implementation Architecture
 
+```
+                               ┌────────────────────────────────────────────────────────────────────┐
+                               │                                                                    │
+                      Serves   │                       Server          ┌────────────────────────┐   │
+         ┌────────────GET /────┼─────────────────┐                     │                        │   │
+         │                     │                 │                     │   api.go               │   │
+         ▼                     │                 │                     │                        │   │
+┌─────────────────┐            │                 │                     │   APIService           │   │
+│                 │            │                 │                     │   <struct>             │   │
+│     Client      │            │                 │                     │   - db Database        │   │
+│                 │            │                 │                     │                        │   │
+│   index.html    │            │                 │                ┌───▶│   ┌─────────────────┐  │   │
+│   bundle.js     │            │     ┌───────────────────────┐    │    │   │     Message     │  │   │
+│                 │            │     │                       │    │    │   │ - list all      │  │   │
+│        ▲        │            │     │  main.go              │    │    │   │ - get one       │  │   │
+│        │        │────────┐   │     │                       │    │    │   │ - create one    │  │   │
+│     Webpack     │        │   │     │  - Inits DB           │    │    │   │ - destroy one   │  │   │
+│        │        │        │   │     │  - Registers API      │Register │   └─────────────────┘  │   │
+│        │        │        │   │     │    handlers           │Handlers └────────────────────────┘   │
+│                 │  Calls │   │     │  - Serves requests    │    │                 ▲               │
+│   index.html    │   /api └───┼────▶│    w/ mux             │────┘                 │               │
+│   index.js      │            │     │                       │                      │               │
+│                 │            │     │                       │                      │               │
+└─────────────────┘            │     │                       │         ┌────────────────────────┐   │
+                               │     │                       │         │                        │   │
+                               │     │                       │         │   db.go                │   │
+                               │     │                       │         │                        │   │
+                               │     └───────────────────────┘         │   Database             │   │
+                               │                 │                     │   <interface>          │   │
+                               │                 │                     │   - Accesses bolt.DB   │   │
+                               │                 │                     │   - CRUD opts for msg  │   │
+                               │        .─────.  └─Init DB────────────▶│   ┌─────────────────┐  │◀─┐│
+                               │      ,'       `.                      │   │     Message     │  │  ││
+                               │     ;  Bolt DB  :                     │   │ - id            │  │  ││
+                               │     :messages.db;                     │   │ - message       │  │  ││
+                               │      ╲         ╱                      │   │ - isPalindrome  │  │  ││
+                               │       `.     ,'                       │   │ - createdAt     │  │  ││
+                               │         `───'                         │   └─────────────────┘  │  ││
+                               │           ▲                           └────────────────────────┘  ││
+                               └───────────┼───────────────────────────────────────────────────────┼┘
+                                           └───────────────────JSON serialization──────────────────┘ 
+```                                                                                                     
+
+
 ## Sequence Diagram
 
+```
+                    ┌─────────────────────┐              ┌─────────────────────┐                ┌─────────────────────┐
+                    │                     │              │                     │                │                     │
+                    │       Client        │              │       Handler       │                │      Database       │
+                    │                     │              │                     │                │                     │
+                    └─────────────────────┘              └─────────────────────┘                └─────────────────────┘
+                               │                                    │                                      │           
+                                                                  ┌───┐                                                
+                             ┌─┴─┐         HTTP Request           │   │                                    │           
+──────Create a message─────▶ │   │ ─────POST /api/messages────▶   │   │                                                
+                             │   │                                │   │                                    │           
+                             │   │                                │   │                                                
+                             │   │                                │   │                                  ┌─┴─┐         
+                             │   │                                │   │   ──────Store in Database────▶   │   │         
+                             │   │                                │   │                                  │   │         
+                             │   │                                │   │                                  │   │         
+                             │   │          HTTP Response         │   │               Message            │   │         
+                             │   │  ◀────────201 CREATED────────  │   │    ◀────Serialized as JSON─────  │   │         
+                             └─┬─┘                                └─┬─┘                                  └─┬─┘         
+                                                                                                                       
+                               │                                    │                                      │                
+```
 ## REST API Documentation
 
 ### Introduction
