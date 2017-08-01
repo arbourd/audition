@@ -30,7 +30,7 @@ const AddMessage = ({state, actions}) =>
 
 const MessageList = ({state, actions}) =>
 	<div class="audition-message-list">
-		<div class="subtitle">Message List</div>
+		<div class="subtitle">Messages</div>
 		{state.messages.map(m =>
 			<Message
 				id={m.id}

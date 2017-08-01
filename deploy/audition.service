@@ -1,0 +1,16 @@
+[Unit]
+Description=Audition
+After=docker.service
+Requires=docker.service
+
+[Service]
+User=core
+Restart=always
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill audition
+ExecStartPre=-/usr/bin/docker rm audition
+ExecStartPre=/usr/bin/docker pull arbourd/audition:latest
+ExecStart=/bin/bash -c "docker run --name audition -p 80:8080 -v ~/db:/db arbourd/audition"
+
+[Install]
+WantedBy=multi-user.target

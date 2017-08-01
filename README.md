@@ -129,9 +129,19 @@ To access the box after the fact, simply SSH into using the public IP and the `c
 $ ssh core@audition.ip
 ```
 
-If for whatever reason Terraform is unable to start the Docker container itself
+Starting service
 ```bash
-$ docker run -d --name audition --restart unless-stopped -p 80:8080 -v $(pwd)/db:/db arbourd/audition:latest
+$ sudo systemctl start audition.service
+```
+
+Restarting service
+```bash
+$ sudo systemctl restart audition.service
+```
+
+Starting the container manually without systemd service
+```bash
+$ docker run -d --name audition --restart unless-stopped -p 80:8080 -v $(pwd)/db:/db arbourd/audition
 ```
 
 ## Implementation Architecture

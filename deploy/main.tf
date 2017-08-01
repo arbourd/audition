@@ -12,10 +12,23 @@ resource "digitalocean_droplet" "app" {
 	name               = "app-1"
 	ssh_keys		   = "${var.ssh_key_ids}"
 
+	provisioner "file" {
+		source      = "audition.service"
+		destination = "/tmp/audition.service"
+
+		connection {
+			type        = "ssh"
+			private_key = "${file("${var.private_key}")}"
+			user        = "core"
+			timeout     = "2m"
+		}
+	}
 
 	provisioner "remote-exec" {
 		inline = [
-			"docker run -d --name audition --restart unless-stopped -p 80:8080 -v $(pwd)/db:/db arbourd/audition:latest",
+			"/usr/bin/sudo mv /tmp/audition.service /etc/systemd/system/audition.service",
+			"/usr/bin/sudo systemctl enable /etc/systemd/system/audition.service",
+			"/usr/bin/sudo systemctl start audition.service"
 		]
 
 		connection {
