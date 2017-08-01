@@ -2,52 +2,85 @@ import {h, app} from 'hyperapp'
 
 const API_URL = `//${window.location.host}/api`
 
-// Message component
-const Message = ({id, message, isPalindrome, createdAt, details, actions}) =>
-	<li>
-		{message}
-		<button onclick={e => actions.setDetailFlag({id: id})}>Details</button>
-		<button onclick={e => actions.deleteMessage({id: id})}>-</button>
-		<div class={details === true ? 'show' : 'hide'}>
-			Palindrome: {isPalindrome.toString()} <br />
-			Created: {Date(createdAt).toString()}
+const Header = () =>
+	<div class="audition-header">
+		<div class="title">Audition</div>
+		<div class="subtitle">A demonstration of Golang, Hyperapp and Terraform</div>
+	</div>
+
+const AddMessage = ({state, actions}) =>
+	<div class="audition-add-message">
+		<div class="subtitle">Add a new message</div>
+		<div class="field is-grouped">
+			<div class="control is-expanded">
+				<input
+					class="input"
+					type="text"
+					placeholder={state.placeholder}
+					onkeyup={e => (e.keyCode === 13 ? actions.createMessage() : '')}
+					oninput={e => actions.setInput(e.target.value)}
+					value={state.input}
+				/>
+			</div>
+			<div class="control">
+				<button class="button is-info" onclick={actions.createMessage}>+</button>
+			</div>
 		</div>
-	</li>
+	</div>
+
+const MessageList = ({state, actions}) =>
+	<div class="audition-message-list">
+		<div class="subtitle">Message List</div>
+		{state.messages.map(m =>
+			<Message
+				id={m.id}
+				message={m.message}
+				isPalindrome={m.isPalindrome}
+				createdAt={m.createdAt}
+				details={m.details}
+				actions={actions}
+			/>
+		)}
+	</div>
+
+const Message = ({id, message, isPalindrome, createdAt, details, actions}) =>
+	<div class="audition-message">
+		<div class="field is-grouped">
+			<div class="control is-expanded">
+				<div class="label">{message}</div>
+			</div>
+			<div class="control">
+				<button class="button" onclick={e => actions.setDetailFlag({id: id})}>Details</button>
+			</div>
+			<div class="control">
+				<button class="button is-danger" onclick={e => actions.deleteMessage({id: id})}>-</button>
+			</div>
+		</div>
+		<div class={'audition-details ' + (details === true ? 'show' : 'hide')}>
+			<div class="subtitle">Details</div>
+			<hr/>
+			<p>Palindrome: {isPalindrome.toString()}</p>
+			<p>Created: {Date(createdAt).toString()}</p>
+		</div>
+	</div>
 
 app({
 	state: {
 		input: '',
-		placeholder: 'Add new message',
+		placeholder: '',
 		messages: []
 	},
 	events: {
 		init: (state, actions) => (actions.listMessages())
 	},
 	view: (state, actions) => (
-		<main>
-			<h1>Messages</h1>
-			<input
-				type="text"
-				placeholder={state.placeholder}
-				onkeyup={e => (e.keyCode === 13 ? actions.createMessage() : '')}
-				oninput={e => actions.setInput(e.target.value)}
-				value={state.input}
-				autofocus
-			/>
-			<button onclick={actions.createMessage}>+</button>
-			<ul>
-				{state.messages.map(m =>
-					<Message
-						id={m.id}
-						message={m.message}
-						isPalindrome={m.isPalindrome}
-						createdAt={m.createdAt}
-						details={m.details}
-						actions={actions}
-					/>
-				)}
-			</ul>
-		</main>
+		<div class="container">
+			<div class="section">
+				<Header />
+				<AddMessage state={state} actions={actions}/>
+				<MessageList state={state} actions={actions}/>
+			</div>
+		</div>
 	),
 	actions: {
 		// Helper actions for manipulating state

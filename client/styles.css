@@ -1,0 +1,60 @@
+
+html {
+	background-color: #f5f7fa
+}
+.container {
+	padding-top: 50px;
+	max-width: 968px;
+}
+.section {
+	margin-top: 40px;
+	border: 1px solid #efefef;
+	border-radius: 5px;
+	background-color: #fff;
+}
+.audition-header {
+	padding: 40px 40px 80px 40px;
+	margin-left: 35px;
+}
+.audition-add-message {
+	border-top: 1px solid #efefef;
+	border-bottom: 1px solid #efefef;
+	padding: 15px 95px 20px 95px;
+	margin: 0 -20px -20px -20px;
+}
+.audition-add-message .subtitle {
+	font-size: 14px;
+	color: #bbb;
+	margin-bottom: 10px;
+}
+.audition-message-list {
+	padding: 75px;
+}
+.audition-message-list .subtitle {
+	font-size: 14px;
+	color: #bbb;
+}
+.audition-message {
+	margin-bottom: 20px;
+}
+.audition-message .field:not(:last-child) {
+	margin-bottom: 0;
+}
+.audition-details {
+	margin: 0;
+}
+.audition-details .subtitle {
+	font-size: 14px;
+	color: #bbb;
+	margin: 0 0 5px 0;
+}
+.audition-details hr {
+	margin: 0 0 10px 0;
+}
+
+.show {
+	display: block;
+}
+.hide {
+	display: none;
+}
