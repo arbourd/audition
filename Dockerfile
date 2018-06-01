@@ -1,4 +1,4 @@
-FROM golang:1.8.3 AS builder
+FROM golang:1.10 AS builder
 WORKDIR /go/src/github.com/arbourd/audition/
 COPY *.go ./
 COPY vendor ./vendor
