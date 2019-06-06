@@ -2,8 +2,7 @@ dist: trusty
 language: go
 
 go:
-  - '1.10'
-  - tip
+  - '1.12'
 
 script:
   - go test -cpu=1,2 -v

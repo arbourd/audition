@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/boltdb/bolt"
 	"github.com/gorilla/mux"
+	bolt "go.etcd.io/bbolt"
 )
 
 func main() {
 	// Open Bolt DB on file system
-	db, err := bolt.Open("db/messages.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
+	db, err := bolt.Open("messages.db", 0600, &bolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,6 +40,6 @@ func main() {
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Println("Audition is running...")
+	log.Printf("Audition is listening on %s ...", srv.Addr)
 	log.Fatal(srv.ListenAndServe())
 }
